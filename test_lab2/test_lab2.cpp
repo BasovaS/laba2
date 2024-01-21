@@ -3,28 +3,27 @@
 #include <iostream>
 #include <cmath>
 #include <iomanip>  
-using namespace std;
 
 class Integral {
 public:
     Integral() : argumentValues(nullptr), functionValues(nullptr), n(0) {}
 
-    Integral(size_t size, const vector<double>& args, const vector<double>& vals)
+    Integral(size_t size, const std::vector<double>& args, const std::vector<double>& vals)
         : n(size)
     {
         if (args.size() != size || vals.size() != size) {
-            throw invalid_argument("Size mismatch between argument values and function values.");
+            throw std::invalid_argument("Size mismatch between argument values and function values.");
         }
 
         argumentValues = new double[size];
         functionValues = new double[size];
 
         if (!argumentValues || !functionValues) {
-            throw bad_alloc();
+            throw std::bad_alloc();
         }
 
-        copy(begin(args), end(args), argumentValues);
-        copy(begin(vals), end(vals), functionValues);
+        std::copy(begin(args), end(args), argumentValues);
+        std::copy(begin(vals), end(vals), functionValues);
     }
 
     Integral(const Integral& other) : n(other.n) {
@@ -32,11 +31,11 @@ public:
         functionValues = new double[n];
 
         if (!argumentValues || !functionValues) {
-            throw bad_alloc();
+            throw std::bad_alloc();
         }
 
-        copy(other.argumentValues, other.argumentValues + n, argumentValues);
-        copy(other.functionValues, other.functionValues + n, functionValues);
+        std::copy(other.argumentValues, other.argumentValues + n, argumentValues);
+        std::copy(other.functionValues, other.functionValues + n, functionValues);
     }
 
     Integral& operator=(const Integral& other) {
@@ -51,11 +50,11 @@ public:
         functionValues = new double[n];
 
         if (!argumentValues || !functionValues) {
-            throw bad_alloc();
+            throw std::bad_alloc();
         }
 
-        copy(other.argumentValues, other.argumentValues + n, argumentValues);
-        copy(other.functionValues, other.functionValues + n, functionValues);
+        std::copy(other.argumentValues, other.argumentValues + n, argumentValues);
+        std::copy(other.functionValues, other.functionValues + n, functionValues);
         return *this;
     }
 
@@ -66,7 +65,7 @@ public:
 
     double operator[](size_t index) const {
         if (index >= n) {
-            throw out_of_range("Index out of range");
+            throw std::out_of_range("Index out of range");
         }
         return functionValues[index];
     }
@@ -81,7 +80,7 @@ public:
 
     double SimpsonMethod() const {
         if (n % 2 == 0) {
-            throw logic_error("The number of intervals must be odd for Simpson's Method.");
+            throw std::logic_error("The number of intervals must be odd for Simpson's Method.");
         }
 
         double h = (argumentValues[n - 1] - argumentValues[0]) / (n - 1);
@@ -126,7 +125,7 @@ public:
 
     double newtonMethod() const {
         if (n < 4 || n % 3 != 1) {
-            throw invalid_argument("Invalid number of points for Newton's 3/8 rule. It must satisfy the condition: (number_of_points - 1) % 3 == 0.");
+            throw std::invalid_argument("Invalid number of points for Newton's 3/8 rule. It must satisfy the condition: (number_of_points - 1) % 3 == 0.");
         }
         double sum = 0.0;
         for (int i = 0; i < n - 3; i += 3) {
@@ -140,10 +139,10 @@ private:
     double* argumentValues;
     double* functionValues;
     size_t n;
-    friend ostream& operator<<(ostream& os, const Integral& integral);
+    friend std::ostream& operator<<(std::ostream& os, const Integral& integral);
 };
 
-ostream& operator<<(ostream& os, const Integral& integral) {
+std::ostream& operator<<(std::ostream& os, const Integral& integral) {
 
     os << "input= argument ";
     for (size_t i = 0; i < integral.n; ++i) {
@@ -161,36 +160,35 @@ ostream& operator<<(ostream& os, const Integral& integral) {
 int main() {
     try {
         size_t size;
-        cin >> size;
+        std::cin >> size;
 
-        vector<double> argumentValues(size);
-        vector<double> functionValues(size);
+        std::vector<double> argumentValues(size);
+        std::vector<double> functionValues(size);
 
         for (double& val : argumentValues) {
-            cin >> val;
+            std::cin >> val;
         }
 
         for (double& val : functionValues) {
-            cin >> val;
+            std::cin >> val;
         }
 
 
         Integral integral(size, argumentValues, functionValues);
 
-        cout << integral;
+        std::cout << integral;
 
-        cout << "lev priam= " << round(integral.leftRectangleMethod() * 10) / 10 << endl;
-        cout << "sr priam= " << round(integral.middleRectangleMethod() * 10) / 10 << endl;
-        cout << "prav priam= " << round(integral.rightRectangleMethod() * 10) / 10 << endl;
-        cout << "trapeciy= " << round(integral.trapezoidalMethod() * 10) / 10 << endl;
-        cout << "Simpson= " << round(integral.SimpsonMethod() * 10) / 10 << endl;
-        cout << "Newton " << round(integral.newtonMethod() * 10) / 10 << endl;
+        std::cout << "lev priam= " << round(integral.leftRectangleMethod() * 10) / 10 << std::endl;
+        std::cout << "prav priam= " << round(integral.rightRectangleMethod() * 10) / 10 << std::endl;
+        std::cout << "trapeciy= " << round(integral.trapezoidalMethod() * 10) / 10 << std::endl;
+        std::cout << "Simpson= " << round(integral.SimpsonMethod() * 10) / 10 << std::endl;
+        std::cout << "Newton " << round(integral.newtonMethod() * 10) / 10 << std::endl;
     }
-    catch (const bad_alloc& e) {
-        cerr << "Memory allocation error: " << e.what() << endl;
+    catch (const std::bad_alloc& e) {
+        std::cerr << "Memory allocation error: " << e.what() << std::endl;
     }
-    catch (const exception& e) {
-        cerr << "Error: " << e.what() << endl;
+    catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
     }
 
     return 0;
